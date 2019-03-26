@@ -1,0 +1,59 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Price:</strong>
+  <%= @flat.price %>
+</p>
+
+<p>
+  <strong>Surface:</strong>
+  <%= @flat.surface %>
+</p>
+
+<p>
+  <strong>Latitude:</strong>
+  <%= @flat.latitude %>
+</p>
+
+<p>
+  <strong>Longitude:</strong>
+  <%= @flat.longitude %>
+</p>
+
+
+
+<%= link_to 'Edit', edit_flat_path(@flat) %> |
+<%= link_to 'Back', flats_path %>
+
+
+<p>Simular flats : </p> 
+
+<% @recommendations.each do |recommendation| %>
+  <p>
+    <strong>Price:</strong>
+    <%= recommendation.price %>
+  </p>
+
+  <p>
+    <strong>Surface:</strong>
+    <%= recommendation.surface %>
+  </p>
+
+  <p>
+    <strong>Latitude:</strong>
+    <%= recommendation.latitude %>
+  </p>
+
+  <p>
+    <strong>Longitude:</strong>
+    <%= recommendation.longitude %>
+  </p>
+
+  <p>
+    <strong>Distance:</strong>
+    <%= @flat.distance_to recommendation %>
+
+  </p> 
+
+  <hr>  
+<% end %>

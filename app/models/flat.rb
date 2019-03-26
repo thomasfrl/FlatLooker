@@ -1,6 +1,6 @@
 class Flat < ApplicationRecord
-  validates :surface, :longitude, :latitude, :price, presence: true, numericality:  {greater_than: 0}
-  validates :longitude, :latitude, numericality:  {less_than: 90}
+  validates :surface, :price, presence: true, numericality:  {greater_than: 0}
+  validates :longitude, :latitude, presence: true, numericality:  {greater_than: -90, less_than: 90}
   after_create :associate_recommendation
   after_update :associate_recommendation
   after_destroy :associate_recommendation
@@ -91,20 +91,19 @@ class Flat < ApplicationRecord
       mins= []
 
       flats.each do |flat|
-        notes << [flat.id, self.note(flat, average_deviation_distance, average_deviation_price, average_deviation_surface)]
+        value = self.note(flat, average_deviation_distance, average_deviation_price, average_deviation_surface)
+        notes << {flat: flat.id, value: value}
       end
 
       4.times do
         min_note = notes.first
-        min_value = min_note[1]
         notes.each do |note|
-          if note[1] < min_value
-            min_value = note[1]
+          if note[:value] < min_note[:value]
             min_note = note
           end
         end
         notes.delete(min_note)
-        mins << Flat.find(min_note[0])
+        mins << Flat.find(min_note[:flat])
       end
       return mins
     else

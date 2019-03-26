@@ -1,9 +1,9 @@
 class Flat < ApplicationRecord
   validates :surface, :longitude, :latitude, :price, presence: true, numericality:  {greater_than: 0}
   validates :longitude, :latitude, numericality:  {less_than: 90}
-  # after_create :associate_recommendation
-  # after_update :associate_recommendation
-  # after_destroy :associate_recommendation
+  after_create :associate_recommendation
+  after_update :associate_recommendation
+  after_destroy :associate_recommendation
 
   has_many :recommendated_recommendations, foreign_key: :source_flat_id, class_name: "Recommendation"
   has_many :recommendated_flats, through: :recommendated_recommendations, source: :recommendated_flat

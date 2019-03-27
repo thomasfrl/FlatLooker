@@ -112,11 +112,6 @@ class Flat < ApplicationRecord
   end
 
   def associate_recommendation
-    Recommendation.destroy_all
-    Flat.all.each do |flat|
-      flat.recommendations.each do |other_flat|
-        Recommendation.create(recommendated_flat: other_flat, source_flat: flat)
-      end
-    end
+    AssociationFlatCreateJob.perform_later
   end
 end

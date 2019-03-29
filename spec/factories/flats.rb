@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :flat do
-    price { 1.5 }
-    surface { 1.5 }
-    latitude { 1.5 }
-    longitude { 1.5 }
+    price { rand(300..3000) }
+    surface { rand(9..300)}
+    latitude { -5 + rand()*15 }
+    longitude { 40 + rand()*10 }
   end
 end

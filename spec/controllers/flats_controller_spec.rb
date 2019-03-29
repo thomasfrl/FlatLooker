@@ -28,12 +28,9 @@ RSpec.describe FlatsController, type: :controller do
   # This should return the minimal set of attributes required to create a valid
   # Flat. As you add validations to Flat, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
-  }
+  let(:valid_attributes) {FactoryBot.attributes_for(:flat)}
 
-  let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+  let(:invalid_attributes) {{longitude: 120, latitude: 45, price: -6.3, surface: -5 }
   }
 
   # This should return the minimal set of values that should be in the session
@@ -97,14 +94,18 @@ RSpec.describe FlatsController, type: :controller do
   describe "PUT #update" do
     context "with valid params" do
       let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
+        {longitude: 10, latitude: 42, price: 300, surface: 60}
       }
 
       it "updates the requested flat" do
         flat = Flat.create! valid_attributes
         put :update, params: {id: flat.to_param, flat: new_attributes}, session: valid_session
         flat.reload
-        skip("Add assertions for updated state")
+        expect(assigns(:flat).attributes['surface']).to match(new_attributes[:surface])
+        expect(assigns(:flat).attributes['price']).to match(new_attributes[:price])
+        expect(assigns(:flat).attributes['latitude']).to match(new_attributes[:latitude])
+        expect(assigns(:flat).attributes['longitude']).to match(new_attributes[:longitude])
+
       end
 
       it "redirects to the flat" do

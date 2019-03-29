@@ -1,4 +1,3 @@
-Recommendation.destroy_all
 Flat.destroy_all
 
 100.times do 

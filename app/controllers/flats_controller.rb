@@ -4,7 +4,7 @@ class FlatsController < ApplicationController
   # GET /flats
   # GET /flats.json
   def index
-    @flats = Flat.all
+    @flats = Flat.order(:id)
   end
 
   # GET /flats/1

@@ -4,13 +4,15 @@ class Flat < ApplicationRecord
   after_create :associate_recommendation
   after_update :associate_recommendation
   after_destroy :associate_recommendation
-
-  has_many :recommendated_recommendations, foreign_key: :source_flat_id, class_name: "Recommendation"
-  has_many :recommendated_flats, through: :recommendated_recommendations, source: :recommendated_flat
-
-  has_many :source_recommendations, foreign_key: :recommendated_flat_id, class_name: "Recommendation"
-  has_many :source_flats, through: :source_recommendations, source: :source_flat
  
+  def recommendated_flats
+    recommendations = []
+    self.recommendated_flat_ids.each do |id|
+      recommendations << Flat.find(id)
+    end
+    return recommendations
+  end
+
   def longitude_in_rad
     self.longitude/180*Math::PI
   end
@@ -79,14 +81,10 @@ class Flat < ApplicationRecord
    (self.price - other_flat.price).abs/average_deviation_price + (self.surface - other_flat.surface).abs/average_deviation_surface + (self.distance_to(other_flat))/average_deviation_distance
   end
 
-  def recommendations
+  def recommendations(average_deviation_distance, average_deviation_price, average_deviation_surface)
     flats = Flat.all.reject{ |f| f == self}
 
     if flats.size > 4
-      average_deviation_price = Flat.average_deviation_price
-      average_deviation_surface = Flat.average_deviation_surface
-      average_deviation_distance = Flat.average_deviation_distance
-
       notes = []
       mins= []
 
@@ -112,6 +110,6 @@ class Flat < ApplicationRecord
   end
 
   def associate_recommendation
-    AssociationFlatCreateJob.perform_later
+    AssociationFlatCreateJob.set(wait: 1.seconds).perform_later
   end
 end

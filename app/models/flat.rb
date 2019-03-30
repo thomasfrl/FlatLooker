@@ -106,6 +106,11 @@ class Flat < ApplicationRecord
   end
 
   def associate_recommendation
-    AssociationFlatCreateJob.set(wait: 1.seconds).perform_later
+    if Flat.all.size > 0
+      flat = Flat.last
+      recommendated_flat_ids = flat.recommendations(Flat.average_deviation_distance, Flat.average_deviation_price, Flat.average_deviation_surface)
+      flat.update_column(:recommendated_flat_ids, recommendated_flat_ids)
+      AssociationFlatCreateJob.perform_later
+    end
   end
 end

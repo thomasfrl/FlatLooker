@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Flat, type: :model do
+  Flat.destroy_all
   10.times do
     FactoryBot.create(:flat)
   end
@@ -71,15 +72,12 @@ RSpec.describe Flat, type: :model do
 
     describe "#recommendated_flat_ids" do
       it "should have 4 elements" do
-        flat = FactoryBot.create(:flat)
-        flat.run_callbacks :create
-        expect(flat.recommendated_flat_ids.size).to eq(4)
+        expect(Flat.last.recommendated_flat_ids.size).to eq(4)
       end
 
       it "should be related to existing flats" do
         flat = FactoryBot.create(:flat)
-        flat.run_callbacks :create
-        expect(flat.recommendated_flat_ids.map {|id| Flat.try(:find_by_id, id)}).not_to include(nil)
+        expect(Flat.last.recommendated_flat_ids.map {|id| Flat.try(:find_by_id, id)}).not_to include(nil)
       end
     end
 
@@ -89,9 +87,7 @@ RSpec.describe Flat, type: :model do
 
     describe "#associate_recommendation" do
       it "should associate 4 flats to the create one" do
-        flat = FactoryBot.create(:flat)
-        flat.run_callbacks :create
-        expect(flat.recommendated_flat_ids.size).to eq(4)
+        expect(Flat.last.recommendated_flat_ids.size).to eq(4)
       end
     end
 

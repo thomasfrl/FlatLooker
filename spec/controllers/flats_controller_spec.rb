@@ -186,9 +186,6 @@ RSpec.describe FlatsController, type: :controller do
       delete :destroy, params: {id: flat.to_param}, session: valid_session
       expect(Flat.pluck(:updated_at)).not_to eq(flats_update)
     end
-
-
-
   end
 
 end

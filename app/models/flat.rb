@@ -1,16 +1,12 @@
 class Flat < ApplicationRecord
-  validates :surface, :price, presence: true, numericality:  {greater_than: 0}
-  validates :longitude, :latitude, presence: true, numericality:  {greater_than: -90, less_than: 90}
+  validates :surface, :price, presence: true, numericality:  {greater_than_or_equal_to: 0}
+  validates :longitude, :latitude, presence: true, numericality:  {greater_than_or_equal_to: -90, less_than_or_equal_to: 90}
   after_create :associate_recommendation
   after_update :associate_recommendation
   after_destroy :associate_recommendation
  
   def recommendated_flats
-    recommendations = []
-    self.recommendated_flat_ids.each do |id|
-      recommendations << Flat.find(id)
-    end
-    return recommendations
+    self.recommendated_flat_ids.map {|id| Flat.find(id)}
   end
 
   def longitude_in_rad
@@ -18,12 +14,12 @@ class Flat < ApplicationRecord
   end
 
   def latitude_in_rad
-    self.longitude/180*Math::PI
+    self.latitude/180*Math::PI
   end
 
   def distance_to(other_flat)
     begin
-      6378*Math.acos(Math.sin(self.latitude_in_rad)*Math.sin(other_flat.latitude_in_rad) + Math.cos(self.latitude_in_rad)*Math.cos(other_flat.latitude_in_rad)*Math.cos(other_flat.longitude_in_rad - self.longitude_in_rad))
+      6378.137*Math.acos(Math.sin(self.latitude_in_rad)*Math.sin(other_flat.latitude_in_rad) + Math.cos(self.latitude_in_rad)*Math.cos(other_flat.latitude_in_rad)*Math.cos(other_flat.longitude_in_rad - self.longitude_in_rad))
     rescue StandardError => e
       puts e.class
       puts e.message
@@ -101,11 +97,11 @@ class Flat < ApplicationRecord
           end
         end
         notes.delete(min_note)
-        mins << Flat.find(min_note[:flat])
+        mins << min_note[:flat]
       end
       return mins
     else
-      return flats
+      return flats.map {|flat| flat.id}
     end
   end
 

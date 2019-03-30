@@ -6,10 +6,7 @@ class AssociationFlatCreateJob < ApplicationJob
     average_deviation_surface = Flat.average_deviation_surface
     average_deviation_distance = Flat.average_deviation_distance
     Flat.all.each do |flat|
-      recommendated_flat_ids = []
-      flat.recommendations(average_deviation_distance, average_deviation_price, average_deviation_surface).each do |other_flat|
-        recommendated_flat_ids << other_flat.id
-      end
+      recommendated_flat_ids = flat.recommendations(average_deviation_distance, average_deviation_price, average_deviation_surface)
       flat.update_column(:recommendated_flat_ids, recommendated_flat_ids)
     end
   end

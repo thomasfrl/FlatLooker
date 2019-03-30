@@ -30,18 +30,23 @@ RSpec.describe FlatsController, type: :controller do
   # adjust the attributes here as well.
   let(:valid_attributes) {FactoryBot.attributes_for(:flat)}
 
-  let(:invalid_attributes) {{longitude: 120, latitude: 45, price: -6.3, surface: -5 }
-  }
+  let(:invalid_attributes) {{longitude: 120, latitude: 45, price: -6.3, surface: -5 }}
 
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # FlatsController. Be sure to keep this updated too.
   let(:valid_session) { {} }
 
+  Flat.destroy_all
+  10.times do
+    FactoryBot.create(:flat)
+  end
+
   describe "GET #index" do
     it "returns a success response" do
       Flat.create! valid_attributes
       get :index, params: {}, session: valid_session
+      expect(response).to render_template(:index)
       expect(response).to be_successful
     end
   end
@@ -50,7 +55,14 @@ RSpec.describe FlatsController, type: :controller do
     it "returns a success response" do
       flat = Flat.create! valid_attributes
       get :show, params: {id: flat.to_param}, session: valid_session
+      expect(response).to render_template(:show)
       expect(response).to be_successful
+    end
+    it "find the simular flat" do
+      flat = Flat.create! valid_attributes
+      get :show, params: {id: flat.to_param}, session: valid_session
+      expect(assigns(:recommendations).size).to eq 4
+      expect(assigns(:recommendations).map {|id| Flat.try(:find_by_id, id)}).not_to include(nil)
     end
   end
 
@@ -81,13 +93,27 @@ RSpec.describe FlatsController, type: :controller do
         post :create, params: {flat: valid_attributes}, session: valid_session
         expect(response).to redirect_to(Flat.last)
       end
+
+      it "create the associated flats" do
+        post :create, params: {flat: valid_attributes}, session: valid_session
+        expect(Flat.last.recommendated_flat_ids.map {|id| Flat.try(:find_by_id, id)}).not_to include(nil)
+        expect(Flat.last.recommendated_flat_ids.size).to eq(4)
+      end
+
     end
 
     context "with invalid params" do
       it "returns a success response (i.e. to display the 'new' template)" do
         post :create, params: {flat: invalid_attributes}, session: valid_session
+        expect(response).to render_template(:new)
         expect(response).to be_successful
       end
+      it "does not update the associated flats" do
+        flats_update = Flat.pluck(:updated_at)
+        post :create, params: {flat: invalid_attributes}, session: valid_session
+        expect(Flat.pluck(:updated_at)).to eq(flats_update)
+      end
+
     end
   end
 
@@ -113,13 +139,29 @@ RSpec.describe FlatsController, type: :controller do
         put :update, params: {id: flat.to_param, flat: valid_attributes}, session: valid_session
         expect(response).to redirect_to(flat)
       end
+
+      it "update the associated flats" do
+        flat = Flat.create! valid_attributes
+        put :update, params: {id: flat.to_param, flat: valid_attributes}, session: valid_session
+        expect(Flat.last.recommendated_flat_ids.map {|id| Flat.try(:find_by_id, id)}).not_to include(nil)
+        expect(Flat.last.recommendated_flat_ids.size).to eq(4)
+        expect(Flat.last.recommendated_flat_ids).not_to eq(flat.recommendated_flat_ids)
+      end
+
     end
 
     context "with invalid params" do
       it "returns a success response (i.e. to display the 'edit' template)" do
         flat = Flat.create! valid_attributes
         put :update, params: {id: flat.to_param, flat: invalid_attributes}, session: valid_session
+        expect(response).to render_template(:edit)
         expect(response).to be_successful
+      end
+      it "does not update the associated flats" do
+        Flat.create! valid_attributes
+        flat = Flat.last
+        put :update, params: {id: flat.to_param, flat: invalid_attributes}, session: valid_session
+        expect(Flat.last.recommendated_flat_ids).to eq(flat.recommendated_flat_ids)
       end
     end
   end
@@ -137,6 +179,16 @@ RSpec.describe FlatsController, type: :controller do
       delete :destroy, params: {id: flat.to_param}, session: valid_session
       expect(response).to redirect_to(flats_url)
     end
+
+    it "update the associated flats" do
+      flat = Flat.create! valid_attributes
+      flats_update = Flat.pluck(:updated_at)
+      delete :destroy, params: {id: flat.to_param}, session: valid_session
+      expect(Flat.pluck(:updated_at)).not_to eq(flats_update)
+    end
+
+
+
   end
 
 end

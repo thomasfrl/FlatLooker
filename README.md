@@ -1,24 +1,8 @@
-# README
+# FlatLooker
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Small programm whose aim is to determine the 4 four most simular to the select one.
 
-Things you may want to cover:
 
-* Ruby version
+## Link in production:
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+https://simular-flatlooker.herokuapp.com/
